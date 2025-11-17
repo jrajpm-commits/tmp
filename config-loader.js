@@ -1,0 +1,1 @@
+export async function loadConfig(){const r=await fetch('config.json');return await r.json();}
