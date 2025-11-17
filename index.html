@@ -1,1 +1,86 @@
-<!DOCTYPE html><html><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>JSON Loader Webapp</title><style>body{margin:0;font-family:sans-serif}#player-container{max-width:800px;margin:auto;padding:20px}video{width:100%;border-radius:12px}</style></head><body><div id='player-container'><video id='player' controls></video><h3>Data</h3><div id='data-output'></div></div><script src='config-loader.js'></script><script src='data-loader.js'></script><script src='main.js'></script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Universal Video Player</title>
+
+<style>
+    body {
+        background: #101010;
+        color: #f0f0f0;
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+        text-align: center;
+    }
+    video {
+        width: 100%;
+        max-width: 900px;
+        border-radius: 12px;
+        background: #000;
+        margin-top: 10px;
+        margin-bottom: 25px;
+    }
+    #json-output {
+        max-width: 900px;
+        margin: auto;
+        background: #1a1a1a;
+        padding: 15px;
+        border-radius: 12px;
+        white-space: pre-wrap;
+        text-align: left;
+        border: 1px solid #333;
+        font-size: 14px;
+    }
+</style>
+</head>
+
+<body>
+
+<h2>Video Player</h2>
+
+<video id="video" controls playsinline></video>
+
+<h3>JSON Data</h3>
+<div id="json-output">Loading...</div>
+
+<script>
+// Load config.json from same folder
+async function loadConfig() {
+    try {
+        const r = await fetch("config.json?" + Date.now());
+        return await r.json();
+    } catch (e) {
+        document.getElementById("json-output").innerText = "Error loading config.json";
+        return null;
+    }
+}
+
+// Load any JSON file
+async function loadJSON(url) {
+    try {
+        const r = await fetch(url + "?" + Date.now());
+        return await r.json();
+    } catch (e) {
+        return { error: "Failed to load JSON from " + url };
+    }
+}
+
+// Initialize the page
+(async function init() {
+    const cfg = await loadConfig();
+    if (!cfg) return;
+
+    // Set video source
+    const player = document.getElementById("video");
+    player.src = cfg.video_url;
+
+    // Load JSON file and display
+    const data = await loadJSON(cfg.data_url);
+    document.getElementById("json-output").innerText = JSON.stringify(data, null, 2);
+})();
+</script>
+
+</body>
+</html>
